@@ -4,16 +4,9 @@ import java.util.List;
 
 import game.model.player.Player;
 
-public class GameConfiguration {
+public interface GameConfiguration {
 
-	public static Integer getBoardSize() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static List<Player> getPlayers() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	Integer getBoardSize();
+	List<Player> getPlayers();
 
 }

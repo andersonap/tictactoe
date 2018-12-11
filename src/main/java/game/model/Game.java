@@ -3,18 +3,29 @@ package game.model;
 import java.util.Collections;
 import java.util.List;
 
-import game.exception.GameStartException;
-import game.exception.InvalidPlayerException;
-import game.exception.MoveException;
+import game.exception.game.GameStartException;
+import game.exception.game.InvalidPlayerException;
+import game.exception.move.MoveException;
 import game.model.interaction.Interaction;
 import game.model.player.Player;
 
 public class Game {
 
-	public static Interaction interaction;
+	private static Interaction interaction;
 	private Board board;
 	private List<Player> players;
 	private Player winner;
+	
+	
+	public Game(Interaction interaction, Board board, List<Player> players) {
+		this.interaction = interaction;
+		this.board = board;
+		this.players = players;
+	}
+	
+	public static Interaction getInteraction() {
+		return interaction;
+	}
 
 	public Board getBoard() {
 		return board;
@@ -41,16 +52,9 @@ public class Game {
 	}
 
 	public boolean hasWinner() {
-		if (winner == null) {
-			this.checkWinner();
-		}
 		return winner != null;
 	}
 	
-	private void checkWinner() {
-		this.winner = board.getWinner(); 
-	}
-
 	public void shufflePlayers() {
 		Collections.shuffle(this.players);
 	}
@@ -60,27 +64,23 @@ public class Game {
 		
 		interaction.showGameStartMessage();
 		
-		while (!this.hasWinner()) {
+		while (!this.hasWinner() || !this.board.isComplete()) {
 			for (Player player : this.players) {
-				try {
-					player.makeMove(board);
-					interaction.showBoard(board);
-				} catch(MoveException invalidMoveException) {
-					invalidMoveException.printStackTrace();
-				}
+				this.makeMove(player);
+				interaction.showBoard(this.board);
+				this.checkIfGameMustEnd();
 			}
 		}
 		
-		interaction.showWinner(winner);
 	}
-
+	
 	private void validateIfGameIsReadyToStart() {
 		try {
 			this.board.validateSize();
 			this.validatePlayers();
-		} catch (GameStartException e) {
-			interaction.notifyGameCantStart(e.getMessage());
-			e.printStackTrace();
+		} catch (GameStartException exception) {
+			interaction.notifyGameCantStart(exception.getMessage());
+			exception.printStackTrace();
 		}
 	}
 
@@ -99,9 +99,31 @@ public class Game {
 		}
 		return false;
 	}
+	
+	private void makeMove(Player player) {
+		try {
+			player.makeMove(board);
+		} catch(MoveException moveException) {
+			interaction.showMessage(moveException.getMessage());
+			this.makeMove(player);
+		}
+	}
 
-	public void setInteraction(Interaction interaction) {
-		this.interaction = interaction;
+	private void checkIfGameMustEnd() {
+		this.checkWinner();
+		
+		if (this.hasWinner()) {
+			interaction.showWinner(this.winner);
+			System.exit(0);
+		} else if(this.board.isComplete()) {
+			interaction.showDrawMessage();
+			System.exit(0);
+		}
+		
+	}
+	
+	private void checkWinner() {
+		this.winner = board.getWinner(); 
 	}
 
 }

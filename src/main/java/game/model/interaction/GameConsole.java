@@ -11,7 +11,7 @@ public class GameConsole implements Interaction {
 
 	@Override
 	public String getMoveFrom(Player player) {
-		System.out.println(player.getName() + ", please do your move:");
+		System.out.println(player.getName() + ", please make your move:");
 		return scanner.next();
 	}
 
@@ -29,14 +29,24 @@ public class GameConsole implements Interaction {
 	public void showWinner(Player winner) {
 		System.out.println("We have a winner!");
 		System.out.println("Congratulations!");
-		System.out.println("Player " + winner.getName() + " is the winner!");
+		System.out.println(winner.getName() + " is the winner!");
 	}
 
 	@Override
 	public void notifyGameCantStart(String cause) {
-		System.out.print("Houston, we have a problem!");
-		System.out.print("The game can't start");
-		System.out.print("Cause: " + cause);
+		System.out.println("Houston, we have a problem!");
+		System.out.println("The game can't start");
+		System.out.println("Cause: " + cause);
+	}
+
+	@Override
+	public void showMessage(String message) {
+		System.out.println(message);
+	}
+
+	@Override
+	public void showDrawMessage() {
+		System.out.println("Game over! It's a draw!");
 	}
 	
 }

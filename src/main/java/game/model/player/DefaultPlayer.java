@@ -1,6 +1,6 @@
 package game.model.player;
 
-import game.exception.MoveException;
+import game.exception.move.MoveException;
 import game.model.Board;
 import game.model.Game;
 
@@ -56,11 +56,7 @@ public class DefaultPlayer implements Player {
 
 	@Override
 	public void makeMove(Board board) throws MoveException {
-		try {
-			board.addMove(this, Game.interaction.getMoveFrom(this));
-		} catch (MoveException e) {
-			e.printStackTrace();
-		}
+		board.addMove(this, Game.getInteraction().getMoveFrom(this));
 	}
 	
 }

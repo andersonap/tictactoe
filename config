@@ -1,0 +1,4 @@
+BOARD_SIZE:7
+PLAYER:Player 1,X
+PLAYER:Player 2,O
+COMPUTER:Bot,C

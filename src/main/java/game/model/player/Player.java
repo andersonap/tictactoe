@@ -1,6 +1,6 @@
 package game.model.player;
 
-import game.exception.MoveException;
+import game.exception.move.MoveException;
 import game.model.Board;
 
 public interface Player {

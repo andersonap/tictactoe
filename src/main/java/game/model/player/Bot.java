@@ -1,6 +1,8 @@
 package game.model.player;
 
-import game.exception.MoveException;
+import java.util.Random;
+
+import game.exception.move.MoveException;
 import game.model.Board;
 
 public class Bot extends DefaultPlayer {
@@ -15,7 +17,19 @@ public class Bot extends DefaultPlayer {
 	}
 	
 	private String generatePosition(Board board) {
-		return "";
+		Random random = new Random();
+		int low = 1;
+		int high = board.getSize();
+		
+		int horizontalPosition = random.nextInt(high-low) + low;
+		int verticalPosition = random.nextInt(high-low) + low;
+		
+		while(board.getMove(horizontalPosition, verticalPosition) != null) {
+			horizontalPosition = random.nextInt(high-low) + low;
+			verticalPosition = random.nextInt(high-low) + low;
+		}
+		
+		return String.valueOf(horizontalPosition) + "," + String.valueOf(verticalPosition);
 	}
-
+	
 }

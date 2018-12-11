@@ -15,4 +15,8 @@ public interface Interaction {
 
 	void notifyGameCantStart(String cause);
 
+	void showMessage(String message);
+
+	void showDrawMessage();
+
 }

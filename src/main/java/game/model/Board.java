@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import game.exception.InvalidBoardSizeException;
-import game.exception.InvalidMoveException;
-import game.exception.MoveException;
-import game.exception.PositionAlreadyMadeException;
+import game.exception.game.InvalidBoardSizeException;
+import game.exception.move.InvalidMoveFormatException;
+import game.exception.move.InvalidPositionException;
+import game.exception.move.MoveException;
+import game.exception.move.MoveAlreadyMadeException;
 import game.model.player.DefaultPlayer;
 import game.model.player.Player;
 
@@ -116,36 +117,51 @@ public class Board {
 		this.moves.add(new Move(player, this.getHorizontalPosition(position), this.getVerticalPosition(position)));
 	}
 
-	private void validate(String position) throws InvalidMoveException, PositionAlreadyMadeException {
-		if (invalid(position)) {
-			throw new InvalidMoveException();
+	private void validate(String position) throws MoveException {
+		if (this.invalidFormat(position)) {
+			throw new InvalidMoveFormatException();
+		}
+		if (this.invalidSize(position)) {
+			throw new InvalidPositionException();
 		}
 		if (this.moveAlreadyMade(position)) {
-			throw new PositionAlreadyMadeException();
+			throw new MoveAlreadyMadeException();
 		}
+	}
+
+	private boolean invalidSize(String position) {
+		if (getHorizontalPosition(position) > this.size || getVerticalPosition(position) > this.size) {
+			return true;
+		}
+		return false;
 	}
 
 	private int getHorizontalPosition(String position) {
-		return position.charAt(0);
+		return Integer.parseInt(position.split(",")[0]);
 	}
 
 	private int getVerticalPosition(String position) {
-		return position.charAt(2);
+		return Integer.parseInt(position.split(",")[1]);
 	}
 
 	private boolean moveAlreadyMade(String position) {
 		return getMoveOptional(getHorizontalPosition(position), getVerticalPosition(position)).isPresent();
 	}
 
-	private boolean invalid(String position) {
-		if (position == null ||
-				position.length() != 3 ||
-				!Character.isDigit(position.charAt(0)) ||
-				!Character.isDigit(position.charAt(2)) ||
-				position.charAt(1) != ',') {
-			return true;
+	private boolean invalidFormat(String position) {
+		if (position != null && position.contains(",")) {
+			String[] splittedPosition = position.split(",");
+			if (splittedPosition.length == 2) {
+				try {
+					Integer.parseInt(splittedPosition[0]);
+					Integer.parseInt(splittedPosition[1]);
+					return false;
+				} catch (NumberFormatException e) {
+					return true;
+				}
+			}
 		}
-		return false;
+		return true;
 	}
 
 	public void validateSize() throws InvalidBoardSizeException {
@@ -192,6 +208,10 @@ public class Board {
 		}
 		
 		return stringifiedBoard.toString();
+	}
+
+	public boolean isComplete() {
+		return (this.size * this.size) == this.moves.size();
 	}
 
 }

@@ -28,5 +28,5 @@ $ ./gradlew build run --console=plain
 If you are using Windows:
 
 ```sh
-$ gradlew.bat build run --console=plain
+$ start gradlew build run --console=plain
 ```

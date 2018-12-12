@@ -15,12 +15,20 @@ import game.model.player.Player;
 
 public class Board {
 
+	private static final int MAXIMUM_BOARD_SIZE = 10;
+	private static final int MINIMUM_BOARD_SIZE = 3;
+	
+	private static final int HORIZONTAL_POSITION_INDEX = 0;
+	private static final int VERTICAL_POSITION_INDEX = 1;
+	
 	private Integer size;
 	private List<Move> moves;
+	private BoardPrinter boardPrinter;
 	
 	public Board(Integer size) {
 		this.size = size;
 		this.moves = new ArrayList<>();
+		this.boardPrinter = new BoardPrinter();
 	}
 	
 	public Integer getSize() {
@@ -37,6 +45,10 @@ public class Board {
 
 	public void setMoves(List<Move> moves) {
 		this.moves = moves;
+	}
+	
+	public boolean hasMove(int horizontalPosition, int verticalPosition) {
+		return this.getMove(horizontalPosition, verticalPosition) != null;
 	}
 	
 	public Player getWinner() {
@@ -126,11 +138,11 @@ public class Board {
 	}
 
 	private int getHorizontalPosition(String position) {
-		return Integer.parseInt(position.split(",")[0]);
+		return Integer.parseInt(position.split(",")[HORIZONTAL_POSITION_INDEX]);
 	}
 
 	private int getVerticalPosition(String position) {
-		return Integer.parseInt(position.split(",")[1]);
+		return Integer.parseInt(position.split(",")[VERTICAL_POSITION_INDEX]);
 	}
 
 	private boolean moveAlreadyMade(String position) {
@@ -142,8 +154,8 @@ public class Board {
 			String[] splittedPosition = position.split(",");
 			if (splittedPosition.length == 2) {
 				try {
-					Integer.parseInt(splittedPosition[0]);
-					Integer.parseInt(splittedPosition[1]);
+					Integer.parseInt(splittedPosition[HORIZONTAL_POSITION_INDEX]);
+					Integer.parseInt(splittedPosition[VERTICAL_POSITION_INDEX]);
 					return false;
 				} catch (NumberFormatException e) {
 					return true;
@@ -154,7 +166,7 @@ public class Board {
 	}
 
 	public void validateSize() throws InvalidBoardSizeException {
-		if (this.size == null || this.size < 3 || this.size > 10) {
+		if (this.size == null || this.size < MINIMUM_BOARD_SIZE || this.size > MAXIMUM_BOARD_SIZE) {
 			throw new InvalidBoardSizeException();
 		}
 	}
@@ -169,30 +181,7 @@ public class Board {
 	}
 	
 	public String stringify() {
-		StringBuilder stringifiedBoard = new StringBuilder();
-		
-		for(int horizontalPosition = 1; horizontalPosition <= this.size; horizontalPosition++) {
-			for(int verticalPosition = 1; verticalPosition <= this.size; verticalPosition++) {
-				Move move = this.getMove(horizontalPosition, verticalPosition);
-				
-				if (horizontalPosition != this.size) {
-					stringifiedBoard.append("̲");
-				}
-				
-				if (move != null) {
-					stringifiedBoard.append(move.getPlayer().getSymbol());
-				} else {
-					stringifiedBoard.append(" ");
-				}
-				
-				if (verticalPosition != this.size) {
-					stringifiedBoard.append("|");
-				}
-			}
-			stringifiedBoard.append("\n");
-		}
-		
-		return stringifiedBoard.toString();
+		return boardPrinter.stringify(this);
 	}
 
 	public boolean isComplete() {

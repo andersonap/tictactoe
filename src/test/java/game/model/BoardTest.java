@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import game.exception.game.InvalidBoardSizeException;
 import game.exception.move.InvalidMoveFormatException;
 import game.exception.move.InvalidPositionException;
 import game.exception.move.MoveAlreadyMadeException;
@@ -20,68 +21,68 @@ import game.model.player.DefaultPlayer;
 public class BoardTest {
 	
 	public Board board;
-	public DefaultPlayer defaultPlayerOne;
+	public DefaultPlayer defaultPlayer;
 	public Bot bot;
 	
 	@Before public void
 	setup() {
 		this.board = new Board(3);
-		this.defaultPlayerOne = new DefaultPlayer("Player 1", "X");
+		this.defaultPlayer = new DefaultPlayer("Player 1", "X");
 		this.bot = new Bot("Bot", "B");
 	}
 	
 	@Test public void
 	has_winner_when_a_player_completed_a_horizontal_row() throws MoveException {
-		board.addMove(defaultPlayerOne, "3,1");
-		board.addMove(defaultPlayerOne, "3,2");
-		board.addMove(defaultPlayerOne, "3,3");
+		board.addMove(defaultPlayer, "3,1");
+		board.addMove(defaultPlayer, "3,2");
+		board.addMove(defaultPlayer, "3,3");
 		
 		board.addMove(bot, "2,1");
 		board.addMove(bot, "2,3");
 		
-		Assert.assertEquals(defaultPlayerOne, board.getWinner());
+		assertThat(board.getWinner()).isEqualTo(defaultPlayer);
 	}
 	
 	@Test public void
 	has_winner_when_a_player_completed_a_vertical_row() throws MoveException {
-		board.addMove(defaultPlayerOne, "1,2");
-		board.addMove(defaultPlayerOne, "2,2");
-		board.addMove(defaultPlayerOne, "3,2");
+		board.addMove(defaultPlayer, "1,2");
+		board.addMove(defaultPlayer, "2,2");
+		board.addMove(defaultPlayer, "3,2");
 		
 		board.addMove(bot, "2,1");
 		board.addMove(bot, "2,3");
 		
-		Assert.assertEquals(defaultPlayerOne, board.getWinner());
+		assertThat(board.getWinner()).isEqualTo(defaultPlayer);
 	}
 	
 	@Test public void
 	has_winner_when_a_player_completed_a_diagonal_row() throws MoveException {
-		board.addMove(defaultPlayerOne, "1,1");
-		board.addMove(defaultPlayerOne, "2,2");
-		board.addMove(defaultPlayerOne, "3,3");
+		board.addMove(defaultPlayer, "1,1");
+		board.addMove(defaultPlayer, "2,2");
+		board.addMove(defaultPlayer, "3,3");
 		
 		board.addMove(bot, "2,1");
 		board.addMove(bot, "2,3");
 		
-		Assert.assertEquals(defaultPlayerOne, board.getWinner());
+		assertThat(board.getWinner()).isEqualTo(defaultPlayer);
 	}
 	
 	@Test public void
 	has_winner_when_a_player_completed_a_opposite_diagonal_row() throws MoveException {
-		board.addMove(defaultPlayerOne, "1,3");
-		board.addMove(defaultPlayerOne, "2,2");
-		board.addMove(defaultPlayerOne, "3,1");
+		board.addMove(defaultPlayer, "1,3");
+		board.addMove(defaultPlayer, "2,2");
+		board.addMove(defaultPlayer, "3,1");
 		
 		board.addMove(bot, "2,1");
 		board.addMove(bot, "2,3");
 		
-		Assert.assertEquals(defaultPlayerOne, board.getWinner());
+		assertThat(board.getWinner()).isEqualTo(defaultPlayer);
 	}
 	
 	@Test public void
 	when_board_doesnt_have_winner_should_return_null() throws MoveException {
-		board.addMove(defaultPlayerOne, "1,1");
-		board.addMove(defaultPlayerOne, "3,1");
+		board.addMove(defaultPlayer, "1,1");
+		board.addMove(defaultPlayer, "3,1");
 		
 		board.addMove(bot, "2,3");
 		
@@ -104,22 +105,64 @@ public class BoardTest {
 	@Test public void
 	should_not_add_move_when_position_is_bigger_than_board_size() {
 		assertThatThrownBy(() -> 
-			board.addMove(defaultPlayerOne, "4,1"))
+			board.addMove(defaultPlayer, "4,1"))
 				.isInstanceOf(InvalidPositionException.class);
 	}
 	
 	@Test public void
 	should_not_add_move_when_move_has_been_already_made() throws MoveException {
-		board.addMove(defaultPlayerOne, "2,2");
+		board.addMove(defaultPlayer, "2,2");
 		
 		assertThatThrownBy(() -> 
 			board.addMove(bot, "2,2"))
 				.isInstanceOf(MoveAlreadyMadeException.class);
 	}
+	
+	@Test public void
+	should_throw_exception_when_board_size_is_less_than_three() {
+		board.setSize(2);
+		
+		assertThatThrownBy(() -> 
+			board.validateSize())
+				.isInstanceOf(InvalidBoardSizeException.class);
+	}
+	
+	@Test public void
+	should_throw_exception_when_board_size_is_greater_than_ten() {
+		board.setSize(11);
+		
+		assertThatThrownBy(() -> 
+			board.validateSize())
+				.isInstanceOf(InvalidBoardSizeException.class);
+	}
+	
+	@Test public void
+	board_is_complete_when_has_no_moves_to_do() throws MoveException {
+		board.addMove(defaultPlayer, "1,1");
+		board.addMove(bot, "1,2");
+		board.addMove(bot, "1,3");
+		
+		board.addMove(bot, "2,1");
+		board.addMove(bot, "2,2");
+		board.addMove(defaultPlayer, "2,3");
+		
+		board.addMove(defaultPlayer, "3,1");
+		board.addMove(defaultPlayer, "3,2");
+		board.addMove(bot, "3,3");
+		
+		assertThat(board.isComplete()).isTrue();
+	}
+	
+	@Test public void
+	board_is_not_complete_when_it_still_has_moves_to_do() throws MoveException {
+		board.addMove(defaultPlayer, "1,1");
+		
+		assertThat(board.isComplete()).isFalse();
+	}
 
 	private void assertInvalidMove(String invalidMove) {
 		assertThatThrownBy(() -> 
-			board.addMove(defaultPlayerOne, invalidMove))
+			board.addMove(defaultPlayer, invalidMove))
 				.isInstanceOf(InvalidMoveFormatException.class);
 	}
 	

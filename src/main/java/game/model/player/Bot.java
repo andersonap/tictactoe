@@ -17,18 +17,26 @@ public class Bot extends DefaultPlayer {
 	}
 	
 	private String generatePosition(Board board) {
-		Random random = new Random();
-		int low = 1;
-		int high = board.getSize() + 1;
+		int horizontalPosition = generateRandomNumberBetweenOneAndBoardSize(board.getSize());
+		int verticalPosition = generateRandomNumberBetweenOneAndBoardSize(board.getSize());
 		
-		int horizontalPosition = random.nextInt(high-low) + low;
-		int verticalPosition = random.nextInt(high-low) + low;
-		
-		while(board.getMove(horizontalPosition, verticalPosition) != null) {
-			horizontalPosition = random.nextInt(high-low) + low;
-			verticalPosition = random.nextInt(high-low) + low;
+		while(board.hasMove(horizontalPosition, verticalPosition)) {
+			horizontalPosition = generateRandomNumberBetweenOneAndBoardSize(board.getSize());
+			verticalPosition = generateRandomNumberBetweenOneAndBoardSize(board.getSize());
 		}
 		
+		return formattedPosition(horizontalPosition, verticalPosition);
+	}
+	
+	private int generateRandomNumberBetweenOneAndBoardSize(Integer boardSize) {
+		Random random = new Random();
+		int low = 1;
+		int high = boardSize + 1;
+		
+		return random.nextInt(high-low) + low;
+	}
+
+	private String formattedPosition(int horizontalPosition, int verticalPosition) {
 		return String.valueOf(horizontalPosition) + "," + String.valueOf(verticalPosition);
 	}
 	

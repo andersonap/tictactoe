@@ -14,8 +14,6 @@ public class Game {
 	private static Interaction interaction;
 	private Board board;
 	private List<Player> players;
-	private Player winner;
-	
 	
 	public Game(Interaction interaction, Board board, List<Player> players) {
 		this.interaction = interaction;
@@ -43,16 +41,12 @@ public class Game {
 		this.players = players;
 	}
 
-	public Player getWinner() {
-		return winner;
+	private boolean hasWinner() {
+		return getWinner() != null;
 	}
-
-	public void setWinner(Player winner) {
-		this.winner = winner;
-	}
-
-	public boolean hasWinner() {
-		return winner != null;
+	
+	private Player getWinner() {
+		return board.getWinner();
 	}
 	
 	public void shufflePlayers() {
@@ -94,12 +88,19 @@ public class Game {
 
 	private boolean hasInvalidPlayer() {
 		for (Player player : players) {
-			if (player.getName() == null || player.getName().isEmpty() ||
-					player.getSymbol() == null || player.getSymbol().isEmpty()) {
+			if (hasInvalidName(player) || hasInvalidSymbol(player)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	private boolean hasInvalidName(Player player) {
+		return player.getName() == null || player.getName().isEmpty();
+	}
+	
+	private boolean hasInvalidSymbol(Player player) {
+		return player.getSymbol() == null || player.getSymbol().isEmpty();
 	}
 	
 	private void makeMove(Player player) {
@@ -112,10 +113,10 @@ public class Game {
 	}
 
 	private void checkIfGameMustEnd() {
-		this.checkWinner();
+		Player winner = getWinner();
 		
-		if (this.hasWinner()) {
-			interaction.showWinner(this.winner);
+		if (winner != null) {
+			interaction.showWinner(winner);
 			System.exit(0);
 		} else if(this.board.isComplete()) {
 			interaction.showDrawMessage();
@@ -124,8 +125,4 @@ public class Game {
 		
 	}
 	
-	private void checkWinner() {
-		this.winner = board.getWinner(); 
-	}
-
 }

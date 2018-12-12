@@ -19,7 +19,7 @@ public class Bot extends DefaultPlayer {
 	private String generatePosition(Board board) {
 		Random random = new Random();
 		int low = 1;
-		int high = board.getSize();
+		int high = board.getSize() + 1;
 		
 		int horizontalPosition = random.nextInt(high-low) + low;
 		int verticalPosition = random.nextInt(high-low) + low;

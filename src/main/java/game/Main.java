@@ -2,9 +2,9 @@ package game;
 
 import game.model.Board;
 import game.model.Game;
+import game.model.configuration.FileConfiguration;
+import game.model.configuration.GameConfiguration;
 import game.model.interaction.GameConsole;
-import game.util.FileConfiguration;
-import game.util.GameConfiguration;
 
 public class Main {
 

@@ -9,9 +9,8 @@ import java.util.stream.Collectors;
 import game.exception.game.InvalidBoardSizeException;
 import game.exception.move.InvalidMoveFormatException;
 import game.exception.move.InvalidPositionException;
-import game.exception.move.MoveException;
 import game.exception.move.MoveAlreadyMadeException;
-import game.model.player.DefaultPlayer;
+import game.exception.move.MoveException;
 import game.model.player.Player;
 
 public class Board {
@@ -38,13 +37,6 @@ public class Board {
 
 	public void setMoves(List<Move> moves) {
 		this.moves = moves;
-	}
-	
-	public void addMove(Move move) {
-		if (moves == null) {
-			this.moves = new ArrayList<>();
-		}
-		this.moves.add(move);
 	}
 	
 	public Player getWinner() {
@@ -109,11 +101,8 @@ public class Board {
 		return true;
 	}
 
-	public void addMove(DefaultPlayer player, String position) throws MoveException {
+	public void addMove(Player player, String position) throws MoveException {
 		validate(position);
-		if (moves == null) {
-			this.moves = new ArrayList<>();
-		}
 		this.moves.add(new Move(player, this.getHorizontalPosition(position), this.getVerticalPosition(position)));
 	}
 
@@ -145,7 +134,7 @@ public class Board {
 	}
 
 	private boolean moveAlreadyMade(String position) {
-		return getMoveOptional(getHorizontalPosition(position), getVerticalPosition(position)).isPresent();
+		return getMove(getHorizontalPosition(position), getVerticalPosition(position)) != null;
 	}
 
 	private boolean invalidFormat(String position) {
@@ -165,22 +154,18 @@ public class Board {
 	}
 
 	public void validateSize() throws InvalidBoardSizeException {
-		if (this.size < 3 || this.size > 10) {
+		if (this.size == null || this.size < 3 || this.size > 10) {
 			throw new InvalidBoardSizeException();
 		}
 	}
 
-	private Optional<Move> getMoveOptional(int horizontalPosition, int verticalPosition) {
+	public Move getMove(int horizontalPosition, int verticalPosition) {
 		return this.moves.stream()
 				 .filter(move -> 
 				 				 move.getHorizontalPosition().equals(horizontalPosition) &&
 				 				 move.getVerticalPosition().equals(verticalPosition))
-				 .findFirst();
-	}
-	
-	public Move getMove(int horizontalPosition, int verticalPosition) {
-		Optional<Move> moveOptional = getMoveOptional(horizontalPosition, verticalPosition);
-		return moveOptional.isPresent() ? moveOptional.get() : null; 
+				 .findFirst()
+				 .orElse(null);
 	}
 	
 	public String stringify() {

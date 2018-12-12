@@ -1,4 +1,4 @@
-package game.util;
+package game.model.configuration;
 
 import java.util.List;
 

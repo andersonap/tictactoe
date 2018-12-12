@@ -56,7 +56,9 @@ public class Game {
 	}
 	
 	public void shufflePlayers() {
-		Collections.shuffle(this.players);
+		if (this.players != null) {
+			Collections.shuffle(this.players);
+		}
 	}
 
 	public void start() {
@@ -80,7 +82,7 @@ public class Game {
 			this.validatePlayers();
 		} catch (GameStartException exception) {
 			interaction.notifyGameCantStart(exception.getMessage());
-			exception.printStackTrace();
+			System.exit(0);
 		}
 	}
 

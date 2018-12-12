@@ -1,4 +1,4 @@
-package game.util;
+package game.model.configuration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import game.model.player.Bot;
 import game.model.player.DefaultPlayer;
@@ -25,13 +26,17 @@ public class FileConfiguration implements GameConfiguration {
 	@Override
 	public Integer getBoardSize() {
 			try {
-				String boardSize = Files.lines(Paths.get(path)).filter(line -> line.contains(BOARD_SIZE_KEY)).findFirst().orElse(null);
+				String boardSize = getLines().filter(line -> line.contains(BOARD_SIZE_KEY)).findFirst().orElse(null);
 				return getBoardSize(boardSize);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			
 			return null;
+	}
+
+	private Stream<String> getLines() throws IOException {
+		return Files.lines(Paths.get(path));
 	}
 
 	private Integer getBoardSize(String boardSize) {
@@ -53,7 +58,7 @@ public class FileConfiguration implements GameConfiguration {
 	}
 
 	private List<Player> getBots() throws IOException {
-		List<String> players = Files.lines(Paths.get(path)).filter(line -> line.contains(COMPUTER_KEY)).collect(Collectors.toList());
+		List<String> players = getLines().filter(line -> line.contains(COMPUTER_KEY)).collect(Collectors.toList());
 		
 		List<Player> bots = new ArrayList<>();
 		for (String bot : players) {
@@ -65,7 +70,7 @@ public class FileConfiguration implements GameConfiguration {
 	}
 
 	private List<Player> getDefaultPlayers() throws IOException {
-		List<String> players = Files.lines(Paths.get(path)).filter(line -> line.contains(PLAYER_KEY)).collect(Collectors.toList());
+		List<String> players = getLines().filter(line -> line.contains(PLAYER_KEY)).collect(Collectors.toList());
 		
 		List<Player> defaultPlayers = new ArrayList<>();
 		for (String defaultPlayer : players) {
